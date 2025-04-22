@@ -2,7 +2,8 @@ from fastapi import FastAPI, HTTPException
 from sqlmodel import SQLModel,Field, Session, create_engine, select
 from contextlib import asynccontextmanager
 from core.database import engine, create_db_and_tables
-from api import api_empresa
+from api import api_empresa, api_roles
+
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -11,6 +12,7 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(api_empresa.router)
+app.include_router(api_roles.router)
 
 
 

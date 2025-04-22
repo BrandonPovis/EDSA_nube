@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form, Path
-from core.database import engine
 from sqlalchemy.orm import Session
 from models.model_empresa import Empresa
 import base64
@@ -33,3 +32,5 @@ def get_empresa(db : Session):
         })
 
     return resultado
+
+
