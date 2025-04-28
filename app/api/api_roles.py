@@ -1,23 +1,39 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException
 from models.model_roles import RolModulo
 from core.database_NR import collection_name
-from crud.crud_roles import serialize_rolmodulo
-from fastapi import HTTPException
-from bson import ObjectId
+from crud import crud_roles
+
 
 router = APIRouter(prefix="/roles", tags=["Roles"])
 
-#GET Request Method
+
+@router.post("/")
+def crear_rol(role: RolModulo):
+    if collection_name.find_one({"name": role.name}):
+        raise ValueError("Ya existe un rol con ese nombre.")
+    crud_roles.create_role(role)
+    return {"detail": "Rol creado correctamente."}
 
 
-@router.post("/roles")
-async def post_roles(RolModulo: RolModulo):
-    try:
-        document = serialize_rolmodulo(RolModulo)
-        result = collection_name.insert_one(document)
-        return {"message": "Rol guardado", "id": str(result.inserted_id)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.get("/{name}", response_model=RolModulo)
+async def get_role_by_name(name: str):
+    role = collection_name.find_one({"name": name})
+    if not role:
+        raise HTTPException(status_code=404, detail="Rol no encontrado.")
+    return crud_roles.clean_mongo_document(role)
+    
+
+
+@router.delete("/{name}", status_code=200)
+def delete_role(name: str):
+    result = collection_name.delete_one({"name": name})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Rol no encontrado para eliminar.")
+    return {"detail": f"Rol '{name}' eliminado correctamente."}
+
+
+
+
 
 
 

@@ -45,3 +45,5 @@ async def crear_empresa(
 @router.get("/empresas/")  
 async def get_empresas(db: Session = Depends(get_db)):
     return crud_empresa.get_empresa(db)
+
+
