@@ -6,8 +6,8 @@ import requests
 
 def create_empresa(db: Session, data: dict):
     if db.query(Empresa).filter(Empresa.ruc == data["ruc"]).first():
-        return None  # Ya existe
-
+        return None 
+    
     nueva = Empresa(**data)
     db.add(nueva)
     db.commit()
@@ -31,7 +31,7 @@ def get_empresa(db : Session):
     return resultado
 
 
-# 🔥 Aquí pega tu token de APISPeru
+
 TOKEN = "https://dniruc.apisperu.com/api/v1/ruc/20131312955?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBvdmlzYnJheWFuQGdtYWlsLmNvbSJ9.sfT2jmtM9t-Rz9pME4c2UjPwkYR9czl0831ZJmh-xD0"
 
 def buscar_ruc(ruc: str):

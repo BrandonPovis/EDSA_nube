@@ -33,8 +33,3 @@ class RolModulo(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-
-# class Todo(BaseModel):
-#     name: str
-#     description: str
-#     complete: bool

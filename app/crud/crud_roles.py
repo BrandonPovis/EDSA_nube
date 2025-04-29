@@ -13,7 +13,7 @@ def clean_mongo_document(doc: dict) -> dict:
 def create_or_update_role(role: RolModulo):
     role_data = role.model_dump(by_alias=True)
 
-    # Reemplaza el documento si ya existe uno con el mismo nombre, o lo inserta si no existe
+    
     collection_name.replace_one(
         {"name": role.name},  # Filtro por nombre
         role_data,            # Documento nuevo
@@ -23,7 +23,7 @@ def create_or_update_role(role: RolModulo):
     # Recuperar el documento actualizado/insertado
     updated_role = collection_name.find_one({"name": role.name})
 
-    # Eliminar el campo _id si no lo necesitas
+    # Eliminar el campo _id
     if updated_role and "_id" in updated_role:
         del updated_role["_id"]
 
