@@ -9,10 +9,11 @@ router = APIRouter(prefix="/roles", tags=["Roles"])
 
 @router.post("/")
 def crear_rol(role: RolModulo):
-    if collection_name.find_one({"name": role.name}):
-        raise ValueError("Ya existe un rol con ese nombre.")
-    crud_roles.create_role(role)
-    return {"detail": "Rol creado correctamente."}
+    rol_creado = crud_roles.create_or_update_role(role)
+    return {
+        "detail": "Rol creado o actualizado correctamente.",
+        "rol": rol_creado
+    }
 
 
 @router.get("/{name}", response_model=RolModulo)

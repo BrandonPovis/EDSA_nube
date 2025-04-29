@@ -1,15 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Path
-from contextlib import asynccontextmanager
-from crud.crud_empresa import create_empresa
+from crud.crud_empresa import create_empresa, get_empresa, buscar_ruc
 from sqlalchemy.orm import Session
-from schemas.schema_empresa import EmpresaID
-from crud import crud_empresa
 from core.database import get_db
-from models.model_empresa import Empresa
 
 router = APIRouter(prefix="/empresas", tags=["Empresas"])
 
-@router.post("/empresas/")
+@router.post("/")
 async def crear_empresa(
     razonSocial: str = Form(...),
     ruc: str = Form(...),
@@ -17,10 +13,8 @@ async def crear_empresa(
     direccion: str = Form(...),
     telefono: str = Form(...),
     paginaWeb: str = Form(...),
-    logo: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
-    logo_data = await logo.read() if logo else None
 
     data_dict = {
         "razonSocial": razonSocial,
@@ -31,7 +25,7 @@ async def crear_empresa(
         "paginaWeb": paginaWeb
     }
 
-    empresa = crud_empresa.create_empresa(db, data_dict, logo_data)
+    empresa = create_empresa(db, data_dict)
     if not empresa:
         raise HTTPException(status_code=400, detail="El RUC ya está registrado")
 
@@ -41,9 +35,10 @@ async def crear_empresa(
     }
 
 
-
-@router.get("/empresas/")  
+@router.get("/")  
 async def get_empresas(db: Session = Depends(get_db)):
-    return crud_empresa.get_empresa(db)
+    return get_empresa(db)
 
-
+@router.get("/GET RUC")
+async def get_ruc_sunat(ruc: str):
+    return buscar_ruc(ruc)

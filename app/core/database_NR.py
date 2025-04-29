@@ -1,7 +1,18 @@
 from pymongo import MongoClient
+from dotenv import load_dotenv
+import os
 
-client = MongoClient("mongodb+srv://admin:Test12345@edsa.0cvezxa.mongodb.net/?retryWrites=true&w=majority&appName=EDSA")
+# Cargar variables desde .env
+load_dotenv()
 
+# Leer la URL desde las variables de entorno
+MONGO_URL = os.getenv("MONGO_URL")
+
+# Conectar con MongoDB
+client = MongoClient(MONGO_URL)
+
+# Usar la base de datos y colección
 db = client.edsa_db
-
 collection_name = db["edsa_collection"]
+
+

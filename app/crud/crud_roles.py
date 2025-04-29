@@ -10,19 +10,21 @@ def clean_mongo_document(doc: dict) -> dict:
 
 
 # Crear rol
-def create_role(role: RolModulo):
-    if collection_name.find_one({"name": role.name}):
-        raise ValueError("Ya existe un rol con ese nombre.")
-
+def create_or_update_role(role: RolModulo):
     role_data = role.model_dump(by_alias=True)
-    result = collection_name.insert_one(role_data)
 
-    # Recuperar el rol insertado
-    inserted_role = collection_name.find_one({"_id": result.inserted_id})
+    # Reemplaza el documento si ya existe uno con el mismo nombre, o lo inserta si no existe
+    collection_name.replace_one(
+        {"name": role.name},  # Filtro por nombre
+        role_data,            # Documento nuevo
+        upsert=True           # Crea si no existe
+    )
 
-    # Eliminar el campo _id de la respuesta
-    if inserted_role and "_id" in inserted_role:
-        del inserted_role["_id"]
-    return inserted_role
+    # Recuperar el documento actualizado/insertado
+    updated_role = collection_name.find_one({"name": role.name})
 
+    # Eliminar el campo _id si no lo necesitas
+    if updated_role and "_id" in updated_role:
+        del updated_role["_id"]
 
+    return updated_role

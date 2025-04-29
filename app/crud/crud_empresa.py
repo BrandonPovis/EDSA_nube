@@ -1,14 +1,14 @@
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form, Path
 from sqlalchemy.orm import Session
 from models.model_empresa import Empresa
-import base64
+import requests
 
 
-def create_empresa(db: Session, data: dict, logo: bytes = None):
+def create_empresa(db: Session, data: dict):
     if db.query(Empresa).filter(Empresa.ruc == data["ruc"]).first():
         return None  # Ya existe
 
-    nueva = Empresa(**data, logo=logo)
+    nueva = Empresa(**data)
     db.add(nueva)
     db.commit()
     db.refresh(nueva)
@@ -19,18 +19,42 @@ def get_empresa(db : Session):
     resultado = []
 
     for emp in empresas:
-        logo_b64 = base64.b64encode(emp.logo).decode("utf-8") if emp.logo else None
         resultado.append({
-            "id": emp.id,
             "razonSocial": emp.razonSocial,
             "ruc": emp.ruc,
             "correo": emp.correo,
             "direccion": emp.direccion,
             "telefono": emp.telefono,
             "paginaWeb": emp.paginaWeb,
-            "logo": logo_b64
         })
 
     return resultado
 
+
+# 🔥 Aquí pega tu token de APISPeru
+TOKEN = "https://dniruc.apisperu.com/api/v1/ruc/20131312955?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBvdmlzYnJheWFuQGdtYWlsLmNvbSJ9.sfT2jmtM9t-Rz9pME4c2UjPwkYR9czl0831ZJmh-xD0"
+
+def buscar_ruc(ruc: str):
+    try:
+        url = f"https://api.apis.net.pe/v1/ruc?numero={ruc}"
+        headers = {
+            "Authorization": f"Bearer {TOKEN}"
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="No se pudo consultar el RUC")
+
+        data = response.json()
+
+        return {
+            "ruc": data.get("numeroDocumento"),
+            "razon_social": data.get("nombre"),
+            "estado": data.get("estado"),
+            "direccion": data.get("direccion")
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 

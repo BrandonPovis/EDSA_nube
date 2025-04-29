@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from sqlmodel import SQLModel,Field, Session, create_engine, select
 from contextlib import asynccontextmanager
 from core.database import engine, create_db_and_tables
-from api import api_empresa, api_roles
+from routers import router_empresa, router_roles,router_usuario
 
 
 @asynccontextmanager
@@ -11,8 +11,9 @@ async def lifespan(app:FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(api_empresa.router)
-app.include_router(api_roles.router)
+app.include_router(router_empresa.router)
+app.include_router(router_roles.router)
+app.include_router(router_usuario.router)
 
 
 

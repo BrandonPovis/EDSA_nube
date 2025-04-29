@@ -1,17 +1,23 @@
-from sqlmodel import SQLModel,Field, Session, create_engine, select
+from sqlmodel import SQLModel, create_engine, Session
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
 
+# Cargar variables de entorno
+load_dotenv()
 
-# Create the PostgreSQL databse and engine
-rds_postgresql_url = "postgresql://rootuser:edsa123456@edsa.cr82ieywavu2.sa-east-1.rds.amazonaws.com:5432/postgres"
+# Leer la URL de conexión desde el entorno
+rds_postgresql_url = os.getenv("DATABASE_URL_RDS")
 
-engine=create_engine(rds_postgresql_url,echo=True)
+# Crear el engine
+engine = create_engine(rds_postgresql_url, echo=True)
 SessionLocal = sessionmaker(bind=engine)
 
-# Initialize the database
+# Inicializar la base de datos
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
+# Obtener la sesión de base de datos
 def get_db():
     db = SessionLocal()
     try:

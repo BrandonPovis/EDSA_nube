@@ -9,7 +9,6 @@ class EmpresaID(BaseModel):
     direccion: str 
     telefono: str 
     paginaWeb: str
-    logo: bytes | None = None 
 
 class Config:
     orm_mode = True
