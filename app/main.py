@@ -3,6 +3,7 @@ from sqlmodel import SQLModel,Field, Session, create_engine, select
 from contextlib import asynccontextmanager
 from core.database import engine, create_db_and_tables
 from routers import router_empresa, router_roles,router_usuario
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -15,6 +16,16 @@ app.include_router(router_empresa.router)
 app.include_router(router_roles.router)
 app.include_router(router_usuario.router)
 
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
